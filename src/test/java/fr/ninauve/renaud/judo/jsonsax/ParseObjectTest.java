@@ -1,6 +1,7 @@
 package fr.ninauve.renaud.judo.jsonsax;
 
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,12 +35,14 @@ class ParseObjectTest {
 
   @Test
   void should_parse_object_with_strings() {
-    parser.parse("""
+    parser.parse(
+        """
         {
           "name": "toto",
           "nickname": "tata"
         }
-        """, listener);
+        """,
+        listener);
 
     inOrder.verify(listener).startObject();
     inOrder.verify(listener).stringField("name", "toto");
@@ -50,7 +53,8 @@ class ParseObjectTest {
 
   @Test
   void should_parse_object_with_numbers() {
-    parser.parse("""
+    parser.parse(
+        """
         {
           "a": 1.2,
           "b": 3.4
@@ -66,7 +70,8 @@ class ParseObjectTest {
 
   @Test
   void should_parse_object_with_objects() {
-    parser.parse("""
+    parser.parse(
+        """
         {
           "a": {},
           "b": {}
@@ -77,7 +82,7 @@ class ParseObjectTest {
     inOrder.verify(listener).startObjectField("a");
     inOrder.verify(listener).endObject();
     inOrder.verify(listener).startObjectField("b");
-    inOrder.verify(listener).endObject();
+    inOrder.verify(listener, times(2)).endObject();
     verifyNoMoreInteractions(listener);
   }
 }
