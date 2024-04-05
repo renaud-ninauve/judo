@@ -42,4 +42,17 @@ class ParseArrayTest {
     inOrder.verify(listener).endArray();
     verifyNoMoreInteractions(listener);
   }
+
+  @Test
+  void should_parse_string_array() {
+    parser.parse("""
+        [ "hello", "world" ]
+        """, listener);
+
+    inOrder.verify(listener).startArray();
+    inOrder.verify(listener).stringValue("hello");
+    inOrder.verify(listener).stringValue("world");
+    inOrder.verify(listener).endArray();
+    verifyNoMoreInteractions(listener);
+  }
 }
