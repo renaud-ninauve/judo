@@ -4,6 +4,8 @@ public interface JsonSaxListener {
 
   void stringValue(final String value);
 
+  void numberValue(final double numberValue);
+
   void startObject();
 
   void endObject();

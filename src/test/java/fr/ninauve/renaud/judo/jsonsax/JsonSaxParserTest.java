@@ -39,4 +39,12 @@ class JsonSaxParserTest {
     inOrder.verify(listener).stringValue("hello");
     verifyNoMoreInteractions(listener);
   }
+
+  @Test
+  void should_parse_number_value() {
+    parser.parse("12.34", listener);
+
+    inOrder.verify(listener).numberValue(12.34);
+    verifyNoMoreInteractions(listener);
+  }
 }
