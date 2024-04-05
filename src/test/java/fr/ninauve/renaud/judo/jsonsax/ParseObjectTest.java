@@ -47,4 +47,20 @@ class ParseObjectTest {
     inOrder.verify(listener).endObject();
     verifyNoMoreInteractions(listener);
   }
+
+  @Test
+  void should_parse_object_with_numbers() {
+    parser.parse("""
+        {
+          "a": 1.2,
+          "b": 3.4
+        }
+        """, listener);
+
+    inOrder.verify(listener).startObject();
+    inOrder.verify(listener).numberField("a", 1.2);
+    inOrder.verify(listener).numberField("b", 3.4);
+    inOrder.verify(listener).endObject();
+    verifyNoMoreInteractions(listener);
+  }
 }
