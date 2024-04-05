@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class JsonSaxParserTest {
+class ParseArrayTest {
   JsonSaxParser parser;
 
   @Mock JsonSaxListener listener;
@@ -24,15 +24,6 @@ class JsonSaxParserTest {
   }
 
   @Test
-  void should_parse_empty_object() {
-    parser.parse("{}", listener);
-
-    inOrder.verify(listener).startObject();
-    inOrder.verify(listener).endObject();
-    verifyNoMoreInteractions(listener);
-  }
-
-  @Test
   void should_parse_empty_array() {
     parser.parse("[]", listener);
 
@@ -42,18 +33,13 @@ class JsonSaxParserTest {
   }
 
   @Test
-  void should_parse_string_value() {
-    parser.parse("hello", listener);
+  void should_parse_number_array() {
+    parser.parse("[1, 2.3]", listener);
 
-    inOrder.verify(listener).stringValue("hello");
-    verifyNoMoreInteractions(listener);
-  }
-
-  @Test
-  void should_parse_number_value() {
-    parser.parse("12.34", listener);
-
-    inOrder.verify(listener).numberValue(12.34);
+    inOrder.verify(listener).startArray();
+    inOrder.verify(listener).numberValue(1);
+    inOrder.verify(listener).numberValue(2.3);
+    inOrder.verify(listener).endArray();
     verifyNoMoreInteractions(listener);
   }
 }
