@@ -8,6 +8,8 @@ public interface JsonSaxListener {
 
   void startObject();
 
+  void stringField(final String fieldName, final String value);
+
   void endObject();
 
   void startArray();

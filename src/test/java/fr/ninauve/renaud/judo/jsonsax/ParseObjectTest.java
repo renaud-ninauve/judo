@@ -31,4 +31,20 @@ class ParseObjectTest {
     inOrder.verify(listener).endObject();
     verifyNoMoreInteractions(listener);
   }
+
+  @Test
+  void should_parse_object_with_strings() {
+    parser.parse("""
+        {
+          "name": "toto",
+          "nickname": "tata"
+        }
+        """, listener);
+
+    inOrder.verify(listener).startObject();
+    inOrder.verify(listener).stringField("name", "toto");
+    inOrder.verify(listener).stringField("nickname", "tata");
+    inOrder.verify(listener).endObject();
+    verifyNoMoreInteractions(listener);
+  }
 }
