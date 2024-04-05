@@ -13,8 +13,7 @@ public class JsonSaxParser {
   private static final char DOUBLE_QUOTE = '\"';
   private static final char FIELD_NAME_VALUE_DELIMITER = ':';
 
-  private boolean expectingFieldName;
-  private boolean expectingFieldValue;
+  private State state = State.PARSING_ROOT;
   private String currentField;
 
   public void parse(String json, JsonSaxListener listener) {
@@ -29,26 +28,32 @@ public class JsonSaxParser {
       switch (tokenType) {
         case START_OBJECT -> {
           listener.startObject();
-          expectingFieldName = true;
+          state = State.PARSING_OBJECT;
         }
         case END_OBJECT -> {
           listener.endObject();
-          expectingFieldName = false;
+          state = State.PARSING_ROOT;
         }
-        case START_ARRAY -> listener.startArray();
-        case END_ARRAY -> listener.endArray();
+        case START_ARRAY -> {
+          listener.startArray();
+          state = State.PARSING_ARRAY;
+        }
+        case END_ARRAY -> {
+          listener.endArray();
+          state = State.PARSING_ROOT;
+        }
         case StreamTokenizer.TT_WORD -> {
-          if (expectingFieldName) {
-            currentField = tokenizer.sval;
-            expectingFieldName = false;
-            expectingFieldValue = true;
-          } else if (expectingFieldValue) {
-            listener.stringField(currentField, tokenizer.sval);
-            expectingFieldName = true;
-            expectingFieldValue = false;
-            currentField = null;
-          } else {
-            listener.stringValue(tokenizer.sval);
+          switch (state) {
+            case PARSING_ROOT, PARSING_ARRAY -> listener.stringValue(tokenizer.sval);
+            case PARSING_OBJECT -> {
+              currentField = tokenizer.sval;
+              state = State.PARSING_FIELD;
+            }
+            case PARSING_FIELD -> {
+              listener.stringField(currentField, tokenizer.sval);
+              state = State.PARSING_OBJECT;
+            }
+            default -> throw new AssertionError("unexpected word token in state " + state);
           }
         }
         case StreamTokenizer.TT_NUMBER -> listener.numberValue(tokenizer.nval);
@@ -74,5 +79,12 @@ public class JsonSaxParser {
     } catch (IOException e) {
       throw new IllegalStateException("failed to read next token", e);
     }
+  }
+
+  private enum State {
+    PARSING_ROOT,
+    PARSING_OBJECT,
+    PARSING_FIELD,
+    PARSING_ARRAY
   }
 }
