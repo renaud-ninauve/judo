@@ -9,11 +9,15 @@ public class JsonSaxParser {
   private static final char END_OBJECT = '}';
   private static final char START_ARRAY = '[';
   private static final char END_ARRAY = ']';
+  private static final char VALUES_DELIMITER = ',';
 
   public void parse(String json, JsonSaxListener listener) {
     final StreamTokenizer tokenizer = createTokenizer(json);
     int tokenType;
     while ((tokenType = nextToken(tokenizer)) != StreamTokenizer.TT_EOF) {
+      if (tokenType == VALUES_DELIMITER) {
+        continue;
+      }
       switch (tokenType) {
         case START_OBJECT -> listener.startObject();
         case END_OBJECT -> listener.endObject();
@@ -29,10 +33,10 @@ public class JsonSaxParser {
   private StreamTokenizer createTokenizer(String json) {
     StreamTokenizer tokenizer = new StreamTokenizer(new StringReader(json));
     tokenizer.eolIsSignificant(false);
-    tokenizer.ordinaryChar('{');
-    tokenizer.ordinaryChar('}');
-    tokenizer.ordinaryChar('[');
-    tokenizer.ordinaryChar(']');
+    tokenizer.ordinaryChar(START_OBJECT);
+    tokenizer.ordinaryChar(END_OBJECT);
+    tokenizer.ordinaryChar(START_ARRAY);
+    tokenizer.ordinaryChar(END_ARRAY);
     return tokenizer;
   }
 
