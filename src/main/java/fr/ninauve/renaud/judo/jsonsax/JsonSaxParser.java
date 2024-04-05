@@ -21,6 +21,9 @@ public class JsonSaxParser {
       if (tokenType == StreamTokenizer.TT_WORD) {
         listener.stringValue(tokenizer.sval);
       }
+      if (tokenType == StreamTokenizer.TT_NUMBER) {
+        listener.numberValue(tokenizer.nval);
+      }
     }
   }
 
