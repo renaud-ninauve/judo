@@ -7,22 +7,21 @@ import java.io.StringReader;
 public class JsonSaxParser {
   private static final char START_OBJECT = '{';
   private static final char END_OBJECT = '}';
+  private static final char START_ARRAY = '[';
+  private static final char END_ARRAY = ']';
 
   public void parse(String json, JsonSaxListener listener) {
     final StreamTokenizer tokenizer = createTokenizer(json);
     int tokenType;
     while ((tokenType = nextToken(tokenizer)) != StreamTokenizer.TT_EOF) {
-      if (tokenType == START_OBJECT) {
-        listener.startObject();
-      }
-      if (tokenType == END_OBJECT) {
-        listener.endObject();
-      }
-      if (tokenType == StreamTokenizer.TT_WORD) {
-        listener.stringValue(tokenizer.sval);
-      }
-      if (tokenType == StreamTokenizer.TT_NUMBER) {
-        listener.numberValue(tokenizer.nval);
+      switch (tokenType) {
+        case START_OBJECT -> listener.startObject();
+        case END_OBJECT -> listener.endObject();
+        case START_ARRAY -> listener.startArray();
+        case END_ARRAY -> listener.endArray();
+        case StreamTokenizer.TT_WORD -> listener.stringValue(tokenizer.sval);
+        case StreamTokenizer.TT_NUMBER -> listener.numberValue(tokenizer.nval);
+        default -> throw new AssertionError("tokenType " + tokenType + " is not currently handled");
       }
     }
   }
