@@ -33,6 +33,15 @@ class JsonSaxParserTest {
   }
 
   @Test
+  void should_parse_empty_array() {
+    parser.parse("[]", listener);
+
+    inOrder.verify(listener).startArray();
+    inOrder.verify(listener).endArray();
+    verifyNoMoreInteractions(listener);
+  }
+
+  @Test
   void should_parse_string_value() {
     parser.parse("hello", listener);
 

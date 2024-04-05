@@ -9,4 +9,8 @@ public interface JsonSaxListener {
   void startObject();
 
   void endObject();
+
+  void startArray();
+
+  void endArray();
 }
