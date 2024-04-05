@@ -63,4 +63,21 @@ class ParseObjectTest {
     inOrder.verify(listener).endObject();
     verifyNoMoreInteractions(listener);
   }
+
+  @Test
+  void should_parse_object_with_objects() {
+    parser.parse("""
+        {
+          "a": {},
+          "b": {}
+        }
+        """, listener);
+
+    inOrder.verify(listener).startObject();
+    inOrder.verify(listener).startObjectField("a");
+    inOrder.verify(listener).endObject();
+    inOrder.verify(listener).startObjectField("b");
+    inOrder.verify(listener).endObject();
+    verifyNoMoreInteractions(listener);
+  }
 }
