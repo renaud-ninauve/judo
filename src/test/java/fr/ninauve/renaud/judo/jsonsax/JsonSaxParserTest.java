@@ -1,6 +1,7 @@
 package fr.ninauve.renaud.judo.jsonsax;
 
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,5 +29,14 @@ class JsonSaxParserTest {
 
     inOrder.verify(listener).startObject();
     inOrder.verify(listener).endObject();
+    verifyNoMoreInteractions(listener);
+  }
+
+  @Test
+  void should_parse_string_value() {
+    parser.parse("hello", listener);
+
+    inOrder.verify(listener).stringValue("hello");
+    verifyNoMoreInteractions(listener);
   }
 }
