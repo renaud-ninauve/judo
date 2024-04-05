@@ -10,12 +10,13 @@ public class JsonSaxParser {
   private static final char START_ARRAY = '[';
   private static final char END_ARRAY = ']';
   private static final char VALUES_DELIMITER = ',';
+  private static final char DOUBLE_QUOTE = '\"';
 
   public void parse(String json, JsonSaxListener listener) {
     final StreamTokenizer tokenizer = createTokenizer(json);
     int tokenType;
     while ((tokenType = nextToken(tokenizer)) != StreamTokenizer.TT_EOF) {
-      if (tokenType == VALUES_DELIMITER) {
+      if (tokenType == VALUES_DELIMITER || tokenType == DOUBLE_QUOTE) {
         continue;
       }
       switch (tokenType) {
@@ -37,6 +38,7 @@ public class JsonSaxParser {
     tokenizer.ordinaryChar(END_OBJECT);
     tokenizer.ordinaryChar(START_ARRAY);
     tokenizer.ordinaryChar(END_ARRAY);
+    tokenizer.ordinaryChar(DOUBLE_QUOTE);
     return tokenizer;
   }
 
