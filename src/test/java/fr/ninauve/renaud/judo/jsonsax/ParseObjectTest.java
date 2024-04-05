@@ -98,9 +98,10 @@ class ParseObjectTest {
 
     inOrder.verify(listener).startObject();
     inOrder.verify(listener).startArrayField("a");
-    inOrder.verify(listener).endObject();
+    inOrder.verify(listener).endArray();
     inOrder.verify(listener).startArrayField("b");
-    inOrder.verify(listener, times(2)).endObject();
+    inOrder.verify(listener).endArray();
+    inOrder.verify(listener).endObject();
     verifyNoMoreInteractions(listener);
   }
 }

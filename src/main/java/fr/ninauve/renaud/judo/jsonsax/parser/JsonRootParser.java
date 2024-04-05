@@ -14,7 +14,7 @@ public class JsonRootParser implements JsonNodeParser {
     while ((tokenType = nextToken(tokenizer)) != StreamTokenizer.TT_EOF) {
       switch (tokenType) {
         case START_OBJECT -> new JsonObjectParser(null).parseNode(tokenizer, listener);
-        case START_ARRAY -> new JsonArrayParser().parseNode(tokenizer, listener);
+        case START_ARRAY -> new JsonArrayParser(null).parseNode(tokenizer, listener);
         case StreamTokenizer.TT_WORD -> listener.stringValue(tokenizer.sval);
         case StreamTokenizer.TT_NUMBER -> listener.numberValue(tokenizer.nval);
         default -> throw new AssertionError("tokenType " + tokenType + " is not currently handled");

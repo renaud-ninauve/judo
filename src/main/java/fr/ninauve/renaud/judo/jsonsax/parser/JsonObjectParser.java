@@ -3,6 +3,7 @@ package fr.ninauve.renaud.judo.jsonsax.parser;
 import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.DOUBLE_QUOTE;
 import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.END_OBJECT;
 import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.FIELD_NAME_VALUE_DELIMITER;
+import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.START_ARRAY;
 import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.START_OBJECT;
 import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.VALUES_DELIMITER;
 import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.nextToken;
@@ -57,6 +58,14 @@ public class JsonObjectParser implements JsonNodeParser {
                 "expecting a field name but got number " + tokenizer.nval);
           } else {
             new JsonObjectParser(currentField).parseNode(tokenizer, listener);
+            currentField = null;
+          }
+        }
+        case START_ARRAY -> {
+          if (currentField == null) {
+            throw new IllegalArgumentException("expecting a field name but got a start array");
+          } else {
+            new JsonArrayParser(currentField).parseNode(tokenizer, listener);
             currentField = null;
           }
         }
