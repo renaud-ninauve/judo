@@ -56,7 +56,16 @@ public class JsonSaxParser {
             default -> throw new AssertionError("unexpected word token in state " + state);
           }
         }
-        case StreamTokenizer.TT_NUMBER -> listener.numberValue(tokenizer.nval);
+        case StreamTokenizer.TT_NUMBER -> {
+          switch (state) {
+            case PARSING_ROOT, PARSING_ARRAY -> listener.numberValue(tokenizer.nval);
+            case PARSING_FIELD -> {
+              listener.numberField(currentField, tokenizer.nval);
+              state = State.PARSING_OBJECT;
+            }
+            default -> throw new AssertionError("unexpected word token in state " + state);
+          }
+        }
         default -> throw new AssertionError("tokenType " + tokenType + " is not currently handled");
       }
     }
