@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ParseSimpleTest {
+class ParseValueTest {
   JsonSaxParser parser;
 
   @Mock JsonSaxListener listener;
@@ -21,15 +21,6 @@ class ParseSimpleTest {
   void setUp() {
     parser = new JsonSaxParser();
     inOrder = inOrder(listener);
-  }
-
-  @Test
-  void should_parse_empty_object() {
-    parser.parse("{}", listener);
-
-    inOrder.verify(listener).startObject();
-    inOrder.verify(listener).endObject();
-    verifyNoMoreInteractions(listener);
   }
 
   @Test
