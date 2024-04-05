@@ -18,5 +18,7 @@ public interface JsonSaxListener {
 
   void startArray();
 
+  void startArrayField(final String fieldName);
+
   void endArray();
 }

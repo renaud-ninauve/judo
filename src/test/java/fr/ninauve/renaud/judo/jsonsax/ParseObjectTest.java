@@ -85,4 +85,22 @@ class ParseObjectTest {
     inOrder.verify(listener, times(2)).endObject();
     verifyNoMoreInteractions(listener);
   }
+
+  @Test
+  void should_parse_object_with_arrays() {
+    parser.parse(
+        """
+        {
+          "a": [],
+          "b": []
+        }
+        """, listener);
+
+    inOrder.verify(listener).startObject();
+    inOrder.verify(listener).startArrayField("a");
+    inOrder.verify(listener).endObject();
+    inOrder.verify(listener).startArrayField("b");
+    inOrder.verify(listener, times(2)).endObject();
+    verifyNoMoreInteractions(listener);
+  }
 }
