@@ -56,12 +56,12 @@ class ParseObjectTest {
     parser.parse(
         """
         {
-          "name:[]{},'": "toto:[]{},'"
+          "name:[]{},'1.2": "toto:[]{},'1.2"
         }
         """, listener);
 
     inOrder.verify(listener).startObject();
-    inOrder.verify(listener).stringField("name:[]{},'", "toto:[]{},'");
+    inOrder.verify(listener).stringField("name:[]{},'1.2", "toto:[]{},'1.2");
     inOrder.verify(listener).endObject();
     verifyNoMoreInteractions(listener);
   }
