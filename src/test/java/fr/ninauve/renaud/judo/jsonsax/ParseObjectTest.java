@@ -52,6 +52,21 @@ class ParseObjectTest {
   }
 
   @Test
+  void should_parse_object_with_special_chars() {
+    parser.parse(
+        """
+        {
+          "n:a\\"m\\"e": "t:o\\"t\\"o"
+        }
+        """, listener);
+
+    inOrder.verify(listener).startObject();
+    inOrder.verify(listener).stringField("n:a\\\"m\\\"e", "t:o\"t\"o");
+    inOrder.verify(listener).endObject();
+    verifyNoMoreInteractions(listener);
+  }
+
+  @Test
   void should_parse_object_with_numbers() {
     parser.parse(
         """
