@@ -56,12 +56,12 @@ class ParseObjectTest {
     parser.parse(
         """
         {
-          "n:a\\"m\\"e": "t:o\\"t\\"o"
+          "name:[]{},'": "toto:[]{},'"
         }
         """, listener);
 
     inOrder.verify(listener).startObject();
-    inOrder.verify(listener).stringField("n:a\\\"m\\\"e", "t:o\"t\"o");
+    inOrder.verify(listener).stringField("name:[]{},'", "toto:[]{},'");
     inOrder.verify(listener).endObject();
     verifyNoMoreInteractions(listener);
   }
