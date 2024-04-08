@@ -67,6 +67,21 @@ class ParseObjectTest {
   }
 
   @Test
+  void should_parse_object_with_escaped_chars() {
+    parser.parse(
+        """
+        {
+          "\\"name\\"": "\\"toto\\""
+        }
+        """, listener);
+
+    inOrder.verify(listener).startObject();
+    inOrder.verify(listener).stringField("\"name\"", "\"toto\"");
+    inOrder.verify(listener).endObject();
+    verifyNoMoreInteractions(listener);
+  }
+
+  @Test
   void should_parse_object_with_numbers() {
     parser.parse(
         """
