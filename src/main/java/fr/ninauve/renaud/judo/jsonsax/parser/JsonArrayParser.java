@@ -26,14 +26,14 @@ public class JsonArrayParser implements JsonNodeParser {
 
     int tokenType;
     while ((tokenType = nextToken(tokenizer)) != END_ARRAY) {
-      if (tokenType == VALUES_DELIMITER || tokenType == DOUBLE_QUOTE) {
+      if (tokenType == VALUES_DELIMITER) {
         continue;
       }
 
       switch (tokenType) {
         case START_OBJECT -> new JsonObjectParser(null).parseNode(tokenizer, listener);
         case START_ARRAY -> new JsonArrayParser(null).parseNode(tokenizer, listener);
-        case StreamTokenizer.TT_WORD -> listener.stringValue(tokenizer.sval);
+        case StreamTokenizer.TT_WORD, DOUBLE_QUOTE -> listener.stringValue(tokenizer.sval);
         case StreamTokenizer.TT_NUMBER -> listener.numberValue(tokenizer.nval);
         default -> throw new AssertionError(
             "unexpected tokenType " + tokenType + " while parsing array");

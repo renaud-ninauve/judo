@@ -26,7 +26,6 @@ public class JsonSaxParser {
     tokenizer.ordinaryChar(END_OBJECT);
     tokenizer.ordinaryChar(START_ARRAY);
     tokenizer.ordinaryChar(END_ARRAY);
-    tokenizer.ordinaryChar(DOUBLE_QUOTE);
     return tokenizer;
   }
 

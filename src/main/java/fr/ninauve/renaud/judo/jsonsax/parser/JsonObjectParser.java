@@ -29,13 +29,12 @@ public class JsonObjectParser implements JsonNodeParser {
     int tokenType;
     while ((tokenType = nextToken(tokenizer)) != END_OBJECT) {
       if (tokenType == VALUES_DELIMITER
-          || tokenType == DOUBLE_QUOTE
           || tokenType == FIELD_NAME_VALUE_DELIMITER) {
         continue;
       }
 
       switch (tokenType) {
-        case StreamTokenizer.TT_WORD -> {
+        case StreamTokenizer.TT_WORD, DOUBLE_QUOTE -> {
           if (currentField == null) {
             currentField = tokenizer.sval;
           } else {
