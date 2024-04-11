@@ -134,4 +134,33 @@ class ParseObjectTest {
     inOrder.verify(listener).endObject();
     verifyNoMoreInteractions(listener);
   }
+
+  @Test
+  void should_parse_complex_object() {
+    parser.parse(
+        """
+        {
+          "a": {
+            "b": {
+              "c": "cccc"
+            },
+            "d": [{"e":"eeee"}]
+          }
+        }
+        """,
+        listener);
+
+    inOrder.verify(listener).startObject();
+    inOrder.verify(listener).startObjectField("a");
+    inOrder.verify(listener).startObjectField("b");
+    inOrder.verify(listener).stringField("c", "cccc");
+    inOrder.verify(listener).endObject();
+    inOrder.verify(listener).startArrayField("d");
+    inOrder.verify(listener).startObject();
+    inOrder.verify(listener).stringField("e", "eeee");
+    inOrder.verify(listener).endObject();
+    inOrder.verify(listener).endArray();
+    inOrder.verify(listener, times(2)).endObject();
+    verifyNoMoreInteractions(listener);
+  }
 }
