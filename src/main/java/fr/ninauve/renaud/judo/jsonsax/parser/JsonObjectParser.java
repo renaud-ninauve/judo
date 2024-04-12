@@ -1,38 +1,31 @@
 package fr.ninauve.renaud.judo.jsonsax.parser;
 
+import static fr.ninauve.renaud.judo.jsonsax.parser.JsonArrayParser.arrayParser;
+
 import fr.ninauve.renaud.judo.jsonsax.JsonSaxListener;
 
 public class JsonObjectParser implements JsonTokenParser {
   private final JsonTokenParser parentParser;
   private final String parentField;
-  private boolean firstToken = true;
   private String currentField;
+  private boolean firstToken = true;
 
-  public JsonObjectParser(JsonTokenParser parentParser, String parentField) {
+  public static JsonTokenParser objectParser(JsonTokenParser parentParser, String currentField) {
+    return new JsonObjectParser(parentParser, currentField);
+  }
+
+  private JsonObjectParser(JsonTokenParser parentParser, String parentField) {
     this.parentParser = parentParser;
     this.parentField = parentField;
   }
 
   @Override
-  public JsonTokenParser parseToken(JsonToken token, JsonSaxListener listener) {
-    if (firstToken) {
-      firstToken(listener);
+  public void firstToken(JsonSaxListener listener) {
+    if (!firstToken) {
+      return;
     }
-
-    return switch (token.type()) {
-      case COMMA, COLON -> this;
-      case STRING_VALUE -> stringValue(token, listener);
-      case NUMBER_VALUE -> numberValue(token, listener);
-      case START_OBJECT -> startObject();
-      case START_ARRAY -> startArray();
-      case END_OBJECT -> endObject(listener);
-      default -> throw new AssertionError(
-          "unexpected tokenType " + token.type() + " while parsing object");
-    };
-  }
-
-  private void firstToken(JsonSaxListener listener) {
     firstToken = false;
+
     if (parentField == null) {
       listener.startObject();
     } else {
@@ -40,48 +33,52 @@ public class JsonObjectParser implements JsonTokenParser {
     }
   }
 
-  private JsonTokenParser stringValue(JsonToken token, JsonSaxListener listener) {
+  @Override
+  public JsonTokenParser stringValue(JsonSaxListener listener, String value) {
     if (currentField == null) {
-      currentField = token.strValue();
+      currentField = value;
     } else {
-      listener.stringField(currentField, token.strValue());
+      listener.stringField(currentField, value);
       currentField = null;
     }
     return this;
   }
 
-  private JsonTokenParser numberValue(JsonToken token, JsonSaxListener listener) {
+  @Override
+  public JsonTokenParser numberValue(JsonSaxListener listener, double value) {
     if (currentField == null) {
-      throw new IllegalArgumentException(
-          "expecting a field name but got number " + token.numberValue());
+      throw new IllegalArgumentException("expecting a field name but got number " + value);
     } else {
-      listener.numberField(currentField, token.numberValue());
+      listener.numberField(currentField, value);
       currentField = null;
     }
     return this;
   }
 
-  private JsonTokenParser startObject() {
+  @Override
+  public JsonTokenParser startObject(JsonSaxListener listener) {
     if (currentField == null) {
       throw new IllegalArgumentException("expecting a field name but got start object");
     } else {
-      final JsonObjectParser nextParser = new JsonObjectParser(this, currentField);
+      final JsonTokenParser nextParser = objectParser(this, currentField);
       currentField = null;
       return nextParser;
     }
   }
 
-  private JsonTokenParser startArray() {
+  @Override
+  public JsonTokenParser startArray(JsonSaxListener listener) {
     if (currentField == null) {
       throw new IllegalArgumentException("expecting a field name but got start array");
     } else {
-      final JsonTokenParser nextParser = new JsonArrayParser(this, currentField);
+      final JsonTokenParser nextParser = arrayParser(this, currentField);
       currentField = null;
       return nextParser;
     }
   }
 
-  private JsonTokenParser endObject(JsonSaxListener listener) {
+  @Override
+  public JsonTokenParser endObject(JsonSaxListener listener) {
     listener.endObject();
     return parentParser;
   }

@@ -4,18 +4,29 @@ import fr.ninauve.renaud.judo.jsonsax.JsonSaxListener;
 
 public interface JsonTokenParser {
 
-  enum JsonTokenType {
-    STRING_VALUE,
-    NUMBER_VALUE,
-    START_OBJECT,
-    END_OBJECT,
-    START_ARRAY,
-    END_ARRAY,
-    COMMA,
-    COLON
+  default void firstToken(JsonSaxListener listener) {}
+
+  default JsonTokenParser startObject(JsonSaxListener listener) {
+    throw new IllegalArgumentException("unexpected startObject");
   }
 
-  record JsonToken(JsonTokenType type, String strValue, Double numberValue) {}
+  default JsonTokenParser endObject(JsonSaxListener listener) {
+    throw new IllegalArgumentException("unexpected endObject");
+  }
 
-  JsonTokenParser parseToken(JsonToken token, JsonSaxListener listener);
+  default JsonTokenParser startArray(JsonSaxListener listener) {
+    throw new IllegalArgumentException("unexpected startArray");
+  }
+
+  default JsonTokenParser endArray(JsonSaxListener listener) {
+    throw new IllegalArgumentException("unexpected endArray");
+  }
+
+  default JsonTokenParser stringValue(JsonSaxListener listener, String value) {
+    throw new IllegalArgumentException("unexpected stringValue");
+  }
+
+  default JsonTokenParser numberValue(JsonSaxListener listener, double value) {
+    throw new IllegalArgumentException("unexpected numberValue");
+  }
 }

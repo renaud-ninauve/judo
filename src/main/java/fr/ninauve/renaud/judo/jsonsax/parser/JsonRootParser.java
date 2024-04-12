@@ -1,27 +1,37 @@
 package fr.ninauve.renaud.judo.jsonsax.parser;
 
+import static fr.ninauve.renaud.judo.jsonsax.parser.JsonArrayParser.arrayParser;
+import static fr.ninauve.renaud.judo.jsonsax.parser.JsonObjectParser.objectParser;
+
 import fr.ninauve.renaud.judo.jsonsax.JsonSaxListener;
 
 public class JsonRootParser implements JsonTokenParser {
 
-  @Override
-  public JsonTokenParser parseToken(JsonToken token, JsonSaxListener listener) {
-    return switch (token.type()) {
-      case START_OBJECT -> new JsonObjectParser(this, null);
-      case START_ARRAY -> new JsonArrayParser(this, null);
-      case STRING_VALUE -> parseStringValue(token, listener);
-      case NUMBER_VALUE -> parseNumberValue(token, listener);
-      default -> throw new AssertionError("unexpected tokenType " + token.type());
-    };
+  public static JsonTokenParser rootParser() {
+    return new JsonRootParser();
   }
 
-  private JsonTokenParser parseStringValue(JsonToken token, JsonSaxListener listener) {
-    listener.stringValue(token.strValue());
+  private JsonRootParser() {}
+
+  @Override
+  public JsonTokenParser startObject(JsonSaxListener listener) {
+    return objectParser(this, null);
+  }
+
+  @Override
+  public JsonTokenParser startArray(JsonSaxListener listener) {
+    return arrayParser(this, null);
+  }
+
+  @Override
+  public JsonTokenParser stringValue(JsonSaxListener listener, String value) {
+    listener.stringValue(value);
     return this;
   }
 
-  private JsonTokenParser parseNumberValue(JsonToken token, JsonSaxListener listener) {
-    listener.numberValue(token.numberValue());
+  @Override
+  public JsonTokenParser numberValue(JsonSaxListener listener, double value) {
+    listener.numberValue(value);
     return this;
   }
 }
