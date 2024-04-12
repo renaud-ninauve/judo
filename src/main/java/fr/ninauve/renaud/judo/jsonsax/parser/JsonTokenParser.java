@@ -2,8 +2,6 @@ package fr.ninauve.renaud.judo.jsonsax.parser;
 
 public interface JsonTokenParser {
 
-  default void firstToken() {}
-
   default JsonTokenParser startObject() {
     throw new IllegalArgumentException("unexpected startObject");
   }

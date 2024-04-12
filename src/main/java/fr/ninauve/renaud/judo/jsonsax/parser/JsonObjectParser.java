@@ -1,6 +1,6 @@
 package fr.ninauve.renaud.judo.jsonsax.parser;
 
-import static fr.ninauve.renaud.judo.jsonsax.parser.JsonArrayParser.arrayParser;
+import static fr.ninauve.renaud.judo.jsonsax.parser.JsonArrayParser.startArrayParser;
 
 import fr.ninauve.renaud.judo.jsonsax.JsonSaxListener;
 
@@ -9,11 +9,12 @@ public class JsonObjectParser implements JsonTokenParser {
   private final JsonTokenParser parentParser;
   private final String parentField;
   private String currentField;
-  private boolean firstToken = true;
 
-  public static JsonTokenParser objectParser(
+  public static JsonTokenParser startObjectParser(
       JsonSaxListener listener, JsonTokenParser parentParser, String currentField) {
-    return new JsonObjectParser(listener, parentParser, currentField);
+    final JsonObjectParser parser = new JsonObjectParser(listener, parentParser, currentField);
+    parser.start();
+    return parser;
   }
 
   private JsonObjectParser(
@@ -23,13 +24,7 @@ public class JsonObjectParser implements JsonTokenParser {
     this.parentField = parentField;
   }
 
-  @Override
-  public void firstToken() {
-    if (!firstToken) {
-      return;
-    }
-    firstToken = false;
-
+  private void start() {
     if (parentField == null) {
       listener.startObject();
     } else {
@@ -64,7 +59,7 @@ public class JsonObjectParser implements JsonTokenParser {
     if (currentField == null) {
       throw new IllegalArgumentException("expecting a field name but got start object");
     } else {
-      final JsonTokenParser nextParser = objectParser(listener, this, currentField);
+      final JsonTokenParser nextParser = startObjectParser(listener, this, currentField);
       currentField = null;
       return nextParser;
     }
@@ -75,7 +70,7 @@ public class JsonObjectParser implements JsonTokenParser {
     if (currentField == null) {
       throw new IllegalArgumentException("expecting a field name but got start array");
     } else {
-      final JsonTokenParser nextParser = arrayParser(listener, this, currentField);
+      final JsonTokenParser nextParser = startArrayParser(listener, this, currentField);
       currentField = null;
       return nextParser;
     }

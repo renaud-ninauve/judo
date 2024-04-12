@@ -1,6 +1,6 @@
 package fr.ninauve.renaud.judo.jsonsax.parser;
 
-import static fr.ninauve.renaud.judo.jsonsax.parser.JsonObjectParser.objectParser;
+import static fr.ninauve.renaud.judo.jsonsax.parser.JsonObjectParser.startObjectParser;
 
 import fr.ninauve.renaud.judo.jsonsax.JsonSaxListener;
 
@@ -8,11 +8,12 @@ public class JsonArrayParser implements JsonTokenParser {
   private final JsonSaxListener listener;
   private final JsonTokenParser parentParser;
   private final String currentField;
-  private boolean firstToken = true;
 
-  public static JsonTokenParser arrayParser(
+  public static JsonTokenParser startArrayParser(
       JsonSaxListener listener, JsonTokenParser parentParser, String currentField) {
-    return new JsonArrayParser(listener, parentParser, currentField);
+    final JsonArrayParser parser = new JsonArrayParser(listener, parentParser, currentField);
+    parser.start();
+    return parser;
   }
 
   private JsonArrayParser(
@@ -22,13 +23,7 @@ public class JsonArrayParser implements JsonTokenParser {
     this.currentField = currentField;
   }
 
-  @Override
-  public void firstToken() {
-    if (!firstToken) {
-      return;
-    }
-    firstToken = false;
-
+  private void start() {
     if (currentField == null) {
       listener.startArray();
     } else {
@@ -50,12 +45,12 @@ public class JsonArrayParser implements JsonTokenParser {
 
   @Override
   public JsonTokenParser startObject() {
-    return objectParser(listener, this, null);
+    return startObjectParser(listener, this, null);
   }
 
   @Override
   public JsonTokenParser startArray() {
-    return arrayParser(listener, this, null);
+    return startArrayParser(listener, this, null);
   }
 
   @Override

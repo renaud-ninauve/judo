@@ -1,7 +1,7 @@
 package fr.ninauve.renaud.judo.jsonsax.parser;
 
-import static fr.ninauve.renaud.judo.jsonsax.parser.JsonArrayParser.arrayParser;
-import static fr.ninauve.renaud.judo.jsonsax.parser.JsonObjectParser.objectParser;
+import static fr.ninauve.renaud.judo.jsonsax.parser.JsonArrayParser.startArrayParser;
+import static fr.ninauve.renaud.judo.jsonsax.parser.JsonObjectParser.startObjectParser;
 
 import fr.ninauve.renaud.judo.jsonsax.JsonSaxListener;
 
@@ -18,12 +18,12 @@ public class JsonRootParser implements JsonTokenParser {
 
   @Override
   public JsonTokenParser startObject() {
-    return objectParser(listener, this, null);
+    return startObjectParser(listener, this, null);
   }
 
   @Override
   public JsonTokenParser startArray() {
-    return arrayParser(listener, this, null);
+    return startArrayParser(listener, this, null);
   }
 
   @Override

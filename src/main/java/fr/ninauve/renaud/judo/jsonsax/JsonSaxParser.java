@@ -24,7 +24,7 @@ public class JsonSaxParser {
     JsonTokenParser currentParser = rootParser(listener);
     int tokenValue;
     while ((tokenValue = nextToken(tokenizer)) != StreamTokenizer.TT_EOF) {
-      final JsonTokenParser newParser =
+      currentParser =
           switch (tokenValue) {
             case START_OBJECT -> startObject(currentParser);
             case END_OBJECT -> endObject(currentParser);
@@ -35,10 +35,6 @@ public class JsonSaxParser {
                 currentParser, tokenizer.sval);
             default -> throw new IllegalArgumentException("unexpected token " + tokenValue);
           };
-      if (newParser != currentParser) {
-        newParser.firstToken();
-      }
-      currentParser = newParser;
     }
   }
 
