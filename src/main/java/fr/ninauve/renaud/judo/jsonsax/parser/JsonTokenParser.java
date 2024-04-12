@@ -1,32 +1,30 @@
 package fr.ninauve.renaud.judo.jsonsax.parser;
 
-import fr.ninauve.renaud.judo.jsonsax.JsonSaxListener;
-
 public interface JsonTokenParser {
 
-  default void firstToken(JsonSaxListener listener) {}
+  default void firstToken() {}
 
-  default JsonTokenParser startObject(JsonSaxListener listener) {
+  default JsonTokenParser startObject() {
     throw new IllegalArgumentException("unexpected startObject");
   }
 
-  default JsonTokenParser endObject(JsonSaxListener listener) {
+  default JsonTokenParser endObject() {
     throw new IllegalArgumentException("unexpected endObject");
   }
 
-  default JsonTokenParser startArray(JsonSaxListener listener) {
+  default JsonTokenParser startArray() {
     throw new IllegalArgumentException("unexpected startArray");
   }
 
-  default JsonTokenParser endArray(JsonSaxListener listener) {
+  default JsonTokenParser endArray() {
     throw new IllegalArgumentException("unexpected endArray");
   }
 
-  default JsonTokenParser stringValue(JsonSaxListener listener, String value) {
+  default JsonTokenParser stringValue(String value) {
     throw new IllegalArgumentException("unexpected stringValue");
   }
 
-  default JsonTokenParser numberValue(JsonSaxListener listener, double value) {
+  default JsonTokenParser numberValue(double value) {
     throw new IllegalArgumentException("unexpected numberValue");
   }
 }

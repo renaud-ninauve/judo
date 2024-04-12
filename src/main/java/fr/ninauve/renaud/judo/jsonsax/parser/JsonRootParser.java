@@ -6,31 +6,34 @@ import static fr.ninauve.renaud.judo.jsonsax.parser.JsonObjectParser.objectParse
 import fr.ninauve.renaud.judo.jsonsax.JsonSaxListener;
 
 public class JsonRootParser implements JsonTokenParser {
+  private final JsonSaxListener listener;
 
-  public static JsonTokenParser rootParser() {
-    return new JsonRootParser();
+  public static JsonTokenParser rootParser(JsonSaxListener listener) {
+    return new JsonRootParser(listener);
   }
 
-  private JsonRootParser() {}
-
-  @Override
-  public JsonTokenParser startObject(JsonSaxListener listener) {
-    return objectParser(this, null);
-  }
-
-  @Override
-  public JsonTokenParser startArray(JsonSaxListener listener) {
-    return arrayParser(this, null);
+  private JsonRootParser(JsonSaxListener listener) {
+    this.listener = listener;
   }
 
   @Override
-  public JsonTokenParser stringValue(JsonSaxListener listener, String value) {
+  public JsonTokenParser startObject() {
+    return objectParser(listener, this, null);
+  }
+
+  @Override
+  public JsonTokenParser startArray() {
+    return arrayParser(listener, this, null);
+  }
+
+  @Override
+  public JsonTokenParser stringValue(String value) {
     listener.stringValue(value);
     return this;
   }
 
   @Override
-  public JsonTokenParser numberValue(JsonSaxListener listener, double value) {
+  public JsonTokenParser numberValue(double value) {
     listener.numberValue(value);
     return this;
   }

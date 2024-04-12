@@ -5,22 +5,26 @@ import static fr.ninauve.renaud.judo.jsonsax.parser.JsonArrayParser.arrayParser;
 import fr.ninauve.renaud.judo.jsonsax.JsonSaxListener;
 
 public class JsonObjectParser implements JsonTokenParser {
+  private final JsonSaxListener listener;
   private final JsonTokenParser parentParser;
   private final String parentField;
   private String currentField;
   private boolean firstToken = true;
 
-  public static JsonTokenParser objectParser(JsonTokenParser parentParser, String currentField) {
-    return new JsonObjectParser(parentParser, currentField);
+  public static JsonTokenParser objectParser(
+      JsonSaxListener listener, JsonTokenParser parentParser, String currentField) {
+    return new JsonObjectParser(listener, parentParser, currentField);
   }
 
-  private JsonObjectParser(JsonTokenParser parentParser, String parentField) {
+  private JsonObjectParser(
+      JsonSaxListener listener, JsonTokenParser parentParser, String parentField) {
+    this.listener = listener;
     this.parentParser = parentParser;
     this.parentField = parentField;
   }
 
   @Override
-  public void firstToken(JsonSaxListener listener) {
+  public void firstToken() {
     if (!firstToken) {
       return;
     }
@@ -34,7 +38,7 @@ public class JsonObjectParser implements JsonTokenParser {
   }
 
   @Override
-  public JsonTokenParser stringValue(JsonSaxListener listener, String value) {
+  public JsonTokenParser stringValue(String value) {
     if (currentField == null) {
       currentField = value;
     } else {
@@ -45,7 +49,7 @@ public class JsonObjectParser implements JsonTokenParser {
   }
 
   @Override
-  public JsonTokenParser numberValue(JsonSaxListener listener, double value) {
+  public JsonTokenParser numberValue(double value) {
     if (currentField == null) {
       throw new IllegalArgumentException("expecting a field name but got number " + value);
     } else {
@@ -56,29 +60,29 @@ public class JsonObjectParser implements JsonTokenParser {
   }
 
   @Override
-  public JsonTokenParser startObject(JsonSaxListener listener) {
+  public JsonTokenParser startObject() {
     if (currentField == null) {
       throw new IllegalArgumentException("expecting a field name but got start object");
     } else {
-      final JsonTokenParser nextParser = objectParser(this, currentField);
+      final JsonTokenParser nextParser = objectParser(listener, this, currentField);
       currentField = null;
       return nextParser;
     }
   }
 
   @Override
-  public JsonTokenParser startArray(JsonSaxListener listener) {
+  public JsonTokenParser startArray() {
     if (currentField == null) {
       throw new IllegalArgumentException("expecting a field name but got start array");
     } else {
-      final JsonTokenParser nextParser = arrayParser(this, currentField);
+      final JsonTokenParser nextParser = arrayParser(listener, this, currentField);
       currentField = null;
       return nextParser;
     }
   }
 
   @Override
-  public JsonTokenParser endObject(JsonSaxListener listener) {
+  public JsonTokenParser endObject() {
     listener.endObject();
     return parentParser;
   }

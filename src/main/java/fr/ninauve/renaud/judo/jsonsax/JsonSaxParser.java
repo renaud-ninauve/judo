@@ -21,22 +21,22 @@ public class JsonSaxParser {
   public void parse(String json, JsonSaxListener listener) {
     final StreamTokenizer tokenizer = createTokenizer(json);
 
-    JsonTokenParser currentParser = rootParser();
+    JsonTokenParser currentParser = rootParser(listener);
     int tokenValue;
     while ((tokenValue = nextToken(tokenizer)) != StreamTokenizer.TT_EOF) {
       final JsonTokenParser newParser =
           switch (tokenValue) {
-            case START_OBJECT -> startObject(currentParser, listener);
-            case END_OBJECT -> endObject(currentParser, listener);
-            case START_ARRAY -> startArray(currentParser, listener);
-            case END_ARRAY -> endArray(currentParser, listener);
-            case StreamTokenizer.TT_NUMBER -> numberValue(currentParser, listener, tokenizer.nval);
+            case START_OBJECT -> startObject(currentParser);
+            case END_OBJECT -> endObject(currentParser);
+            case START_ARRAY -> startArray(currentParser);
+            case END_ARRAY -> endArray(currentParser);
+            case StreamTokenizer.TT_NUMBER -> numberValue(currentParser, tokenizer.nval);
             case StreamTokenizer.TT_WORD, DOUBLE_QUOTE -> stringValue(
-                currentParser, listener, tokenizer.sval);
+                currentParser, tokenizer.sval);
             default -> throw new IllegalArgumentException("unexpected token " + tokenValue);
           };
       if (newParser != currentParser) {
-        newParser.firstToken(listener);
+        newParser.firstToken();
       }
       currentParser = newParser;
     }
@@ -62,29 +62,27 @@ public class JsonSaxParser {
     }
   }
 
-  private JsonTokenParser startObject(JsonTokenParser currentParser, JsonSaxListener listener) {
-    return currentParser.startObject(listener);
+  private JsonTokenParser startObject(JsonTokenParser currentParser) {
+    return currentParser.startObject();
   }
 
-  private JsonTokenParser endObject(JsonTokenParser currentParser, JsonSaxListener listener) {
-    return currentParser.endObject(listener);
+  private JsonTokenParser endObject(JsonTokenParser currentParser) {
+    return currentParser.endObject();
   }
 
-  private JsonTokenParser startArray(JsonTokenParser currentParser, JsonSaxListener listener) {
-    return currentParser.startArray(listener);
+  private JsonTokenParser startArray(JsonTokenParser currentParser) {
+    return currentParser.startArray();
   }
 
-  private JsonTokenParser endArray(JsonTokenParser currentParser, JsonSaxListener listener) {
-    return currentParser.endArray(listener);
+  private JsonTokenParser endArray(JsonTokenParser currentParser) {
+    return currentParser.endArray();
   }
 
-  private JsonTokenParser stringValue(
-      JsonTokenParser currentParser, JsonSaxListener listener, String value) {
-    return currentParser.stringValue(listener, value);
+  private JsonTokenParser stringValue(JsonTokenParser currentParser, String value) {
+    return currentParser.stringValue(value);
   }
 
-  private JsonTokenParser numberValue(
-      JsonTokenParser currentParser, JsonSaxListener listener, double value) {
-    return currentParser.numberValue(listener, value);
+  private JsonTokenParser numberValue(JsonTokenParser currentParser, double value) {
+    return currentParser.numberValue(value);
   }
 }
