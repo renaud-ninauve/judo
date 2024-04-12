@@ -1,24 +1,27 @@
 package fr.ninauve.renaud.judo.jsonsax.parser;
 
-import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.START_ARRAY;
-import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.START_OBJECT;
-import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.nextToken;
-
 import fr.ninauve.renaud.judo.jsonsax.JsonSaxListener;
-import java.io.StreamTokenizer;
 
-public class JsonRootParser implements JsonNodeParser {
+public class JsonRootParser implements JsonTokenParser {
 
-  public void parseNode(StreamTokenizer tokenizer, JsonSaxListener listener) {
-    int tokenType;
-    while ((tokenType = nextToken(tokenizer)) != StreamTokenizer.TT_EOF) {
-      switch (tokenType) {
-        case START_OBJECT -> new JsonObjectParser(null).parseNode(tokenizer, listener);
-        case START_ARRAY -> new JsonArrayParser(null).parseNode(tokenizer, listener);
-        case StreamTokenizer.TT_WORD -> listener.stringValue(tokenizer.sval);
-        case StreamTokenizer.TT_NUMBER -> listener.numberValue(tokenizer.nval);
-        default -> throw new AssertionError("tokenType " + tokenType + " is not currently handled");
-      }
-    }
+  @Override
+  public JsonTokenParser parseToken(JsonToken token, JsonSaxListener listener) {
+    return switch (token.type()) {
+      case START_OBJECT -> new JsonObjectParser(this, null);
+      case START_ARRAY -> new JsonArrayParser(this, null);
+      case STRING_VALUE -> parseStringValue(token, listener);
+      case NUMBER_VALUE -> parseNumberValue(token, listener);
+      default -> throw new AssertionError("unexpected tokenType " + token.type());
+    };
+  }
+
+  private JsonTokenParser parseStringValue(JsonToken token, JsonSaxListener listener) {
+    listener.stringValue(token.strValue());
+    return this;
+  }
+
+  private JsonTokenParser parseNumberValue(JsonToken token, JsonSaxListener listener) {
+    listener.numberValue(token.numberValue());
+    return this;
   }
 }

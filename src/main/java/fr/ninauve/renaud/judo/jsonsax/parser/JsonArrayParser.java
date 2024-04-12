@@ -1,44 +1,68 @@
 package fr.ninauve.renaud.judo.jsonsax.parser;
 
-import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.DOUBLE_QUOTE;
-import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.END_ARRAY;
-import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.START_ARRAY;
-import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.START_OBJECT;
-import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.VALUES_DELIMITER;
-import static fr.ninauve.renaud.judo.jsonsax.JsonSaxParser.nextToken;
-
 import fr.ninauve.renaud.judo.jsonsax.JsonSaxListener;
-import java.io.StreamTokenizer;
 
-public class JsonArrayParser implements JsonNodeParser {
+public class JsonArrayParser implements JsonTokenParser {
+  private final JsonTokenParser parentParser;
+  private boolean firstToken = true;
   private final String currentField;
 
-  public JsonArrayParser(String currentField) {
+  public JsonArrayParser(JsonTokenParser parentParser, String currentField) {
+    this.parentParser = parentParser;
     this.currentField = currentField;
   }
 
-  public void parseNode(StreamTokenizer tokenizer, JsonSaxListener listener) {
+  @Override
+  public JsonTokenParser parseToken(JsonToken token, JsonSaxListener listener) {
+    if (firstToken) {
+      firstToken(listener);
+    }
+
+    return switch (token.type()) {
+      case START_OBJECT -> startObject();
+      case START_ARRAY -> startArray();
+      case STRING_VALUE -> stringValue(token, listener);
+      case NUMBER_VALUE -> numberValue(token, listener);
+      case COMMA -> comma();
+      case END_ARRAY -> endArray(listener);
+      default -> throw new AssertionError(
+          "unexpected tokenType " + token.type() + " while parsing array");
+    };
+  }
+
+  private void firstToken(JsonSaxListener listener) {
+    firstToken = false;
     if (currentField == null) {
       listener.startArray();
     } else {
       listener.startArrayField(currentField);
     }
+  }
 
-    int tokenType;
-    while ((tokenType = nextToken(tokenizer)) != END_ARRAY) {
-      if (tokenType == VALUES_DELIMITER) {
-        continue;
-      }
+  private JsonTokenParser stringValue(JsonToken token, JsonSaxListener listener) {
+    listener.stringValue(token.strValue());
+    return this;
+  }
 
-      switch (tokenType) {
-        case START_OBJECT -> new JsonObjectParser(null).parseNode(tokenizer, listener);
-        case START_ARRAY -> new JsonArrayParser(null).parseNode(tokenizer, listener);
-        case StreamTokenizer.TT_WORD, DOUBLE_QUOTE -> listener.stringValue(tokenizer.sval);
-        case StreamTokenizer.TT_NUMBER -> listener.numberValue(tokenizer.nval);
-        default -> throw new AssertionError(
-            "unexpected tokenType " + tokenType + " while parsing array");
-      }
-    }
+  private JsonTokenParser numberValue(JsonToken token, JsonSaxListener listener) {
+    listener.numberValue(token.numberValue());
+    return this;
+  }
+
+  private JsonTokenParser startObject() {
+    return new JsonObjectParser(this, null);
+  }
+
+  private JsonTokenParser startArray() {
+    return new JsonArrayParser(this, null);
+  }
+
+  private JsonTokenParser comma() {
+    return this;
+  }
+
+  private JsonTokenParser endArray(JsonSaxListener listener) {
     listener.endArray();
+    return parentParser;
   }
 }
