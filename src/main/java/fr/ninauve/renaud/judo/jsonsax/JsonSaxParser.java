@@ -26,13 +26,12 @@ public class JsonSaxParser {
     while ((tokenValue = nextToken(tokenizer)) != StreamTokenizer.TT_EOF) {
       currentParser =
           switch (tokenValue) {
-            case START_OBJECT -> startObject(currentParser);
-            case END_OBJECT -> endObject(currentParser);
-            case START_ARRAY -> startArray(currentParser);
-            case END_ARRAY -> endArray(currentParser);
-            case StreamTokenizer.TT_NUMBER -> numberValue(currentParser, tokenizer.nval);
-            case StreamTokenizer.TT_WORD, DOUBLE_QUOTE -> stringValue(
-                currentParser, tokenizer.sval);
+            case START_OBJECT -> currentParser.startObject();
+            case END_OBJECT -> currentParser.endObject();
+            case START_ARRAY -> currentParser.startArray();
+            case END_ARRAY -> currentParser.endArray();
+            case StreamTokenizer.TT_NUMBER -> currentParser.numberValue(tokenizer.nval);
+            case StreamTokenizer.TT_WORD, DOUBLE_QUOTE -> currentParser.stringValue(tokenizer.sval);
             default -> throw new IllegalArgumentException("unexpected token " + tokenValue);
           };
     }
@@ -58,27 +57,4 @@ public class JsonSaxParser {
     }
   }
 
-  private JsonTokenParser startObject(JsonTokenParser currentParser) {
-    return currentParser.startObject();
-  }
-
-  private JsonTokenParser endObject(JsonTokenParser currentParser) {
-    return currentParser.endObject();
-  }
-
-  private JsonTokenParser startArray(JsonTokenParser currentParser) {
-    return currentParser.startArray();
-  }
-
-  private JsonTokenParser endArray(JsonTokenParser currentParser) {
-    return currentParser.endArray();
-  }
-
-  private JsonTokenParser stringValue(JsonTokenParser currentParser, String value) {
-    return currentParser.stringValue(value);
-  }
-
-  private JsonTokenParser numberValue(JsonTokenParser currentParser, double value) {
-    return currentParser.numberValue(value);
-  }
 }
